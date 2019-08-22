@@ -1,35 +1,61 @@
-
-from PIL import Image, ImageDraw
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import sys
-import numpy as np
-import SWHear
-from gu7000 import GU7000Ser as Display
+import pyaudio
+from math import log
+from numpy.fft import rfft
+from numpy import int16, empty, fromstring, roll
+from gu7000 import GU7000Ser as display
+from PIL import Image, ImageDraw
 
-class AudioVisualiser:
-    def __init__(self):
+WIDTH=140
+HEIGHT = 16
 
-        self.im = Image.new(1, (140, 16))
-        self.draw = ImageDraw.Draw(self.im)
-        self.maxFFT=0
-        self.maxPCM=0
-        self.ear = SWHear.SWHear(rate=44100,updatesPerSecond=20)
-        self.ear.stream_start()
-        self.d = Display(140, 16, dev='/dev/ttyS2')
+SLICES=4
 
-    def update(self):
-        if not self.ear.data is None and not self.ear.fft is None:
-            #im = Image.new(1, (140, 16))
-            #draw = ImageDraw.Draw(im)
-            pcmMax=np.max(np.abs(self.ear.data))
-            if pcmMax>self.maxPCM:
-                self.maxPCM=pcmMax
-            if np.max(self.ear.fft)>self.maxFFT:
-                self.maxFFT=np.max(np.abs(self.ear.fft))
-            self.draw.line((self.ear.fftx, self.ear.fft/self.maxFFT))
-            self.d.displayImage(self.im)
+CHUNK = int(WIDTH / SLICES) # Size of each 'frame' in rolling buffer
+FFT_LEN = CHUNK*20 # size of rolling buffer for FFT
+RATE = 8000 # Sampling rate
+SIGNAL_SCALE = .0005 # Scaling factor for output
 
+def run():
+    p = pyaudio.PyAudio()
+    stream = p.open(
+        format=pyaudio.paInt16,
+        channels=1, # Mono
+        rate=RATE,
+        input=True,
+        frames_per_buffer=CHUNK
+    )
+    signal = empty(FFT_LEN, dtype=int16)
 
-if __name__=="__main__":
-    av = AudioVisualiser()
-    while True:
-        av.update()
+    d = display(140, 16, dev='/dev/ttyS2')
+    try:
+        while 1:
+            # Roll in new frame into buffer
+            try:
+                frame = stream.read(CHUNK)
+            except IOError as e:
+                if e[1] != pyaudio.paInputOverflowed:
+                    raise
+                continue
+            signal = roll(signal, -CHUNK)
+            signal[-CHUNK:] = fromstring(frame, dtype=int16)
+
+            # Now transform!
+            try:
+                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(signal)[:WIDTH])
+            except ValueError:
+                fftspec = [0] * SLICES
+
+            #create an image
+            im = PIL.Image.new('1', (WIDTH, HEIGHT))
+            draw = ImageDraw.Draw(im)
+            draw.line(zip(iter(fftspec), iter(range(WIDTH))))
+            d.displayImage(im)
+
+            #sys.stdout.write('│' + '│\n│'.join(lines) + '│')
+            #sys.stdout.write('\033[' + str(HEIGHT - 1) +'A\r')
+
+if __name__ == "__main__":
+    run()
