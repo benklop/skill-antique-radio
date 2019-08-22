@@ -83,7 +83,7 @@ def run():
                 ''.join(spark(x - i+1, x) for x in fftspec)
                 for i in range(int(HEIGHT / 8), 0, -1)
             ]
-            sys.stdout.write('│' + '│\n│'.join(lines) + '│')
+            #sys.stdout.write('|' + '|\n|'.join(lines) + '|')
             sys.stdout.write('\033[' + str(int(HEIGHT / 8) - 1) +'A\r')
     except KeyboardInterrupt:
         sys.stdout.write('\n' * int(HEIGHT / 8))
