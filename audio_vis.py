@@ -77,7 +77,7 @@ def run():
         draw = ImageDraw.Draw(im)
         points = [val for pair in zip(range(WIDTH), fftspec) for val in pair]
         draw.line(points, 0)
-        im.transpose(Image.FLIP_TOP_BOTTOM)
+        im = im.transpose(Image.FLIP_TOP_BOTTOM)
         if this_frame % 20 == 0:
             d.displayImage(im)
 
