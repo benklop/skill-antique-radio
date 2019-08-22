@@ -39,7 +39,7 @@ class AudioVis:
             try:
                 frame = stream.read(CHUNK)
             except IOError as e:
-                if e[1] != pyaudio.paInputOverflowed:
+                if e.args[1] != pyaudio.paInputOverflowed:
                     raise
                 continue
             signal = roll(signal, -CHUNK)
@@ -68,8 +68,6 @@ class AudioVis:
         process.start()
         disp = threading.Thread(target=self.display_waveform)
         disp.start()
-        #process.join()
-        #disp.join()
 
 if __name__ == "__main__":
     vis = AudioVis()
