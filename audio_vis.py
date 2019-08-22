@@ -18,6 +18,26 @@ FFT_LEN = CHUNK*20 # size of rolling buffer for FFT
 RATE = 8000 # Sampling rate
 SIGNAL_SCALE = .0005 # Scaling factor for output
 
+SPARKS = [
+  ' ',
+  '\u2581',
+  '\u2582',
+  '\u2583',
+  '\u2584',
+  '\u2585',
+  '\u2586',
+  '\u2587',
+  '\u2588'
+]
+SPARKS_LEN = len(SPARKS)
+
+
+def spark(i, full):
+    i = min(int(max(0.0, i) * SPARKS_LEN), SPARKS_LEN-1)
+    if full > HEIGHT:
+        return '\033[0;31m' + SPARKS[i] + '\033[0m'
+    return SPARKS[i]
+
 def run():
     p = pyaudio.PyAudio()
     stream = p.open(
