@@ -33,8 +33,6 @@ def gather_audio():
     )
     signal = empty(FFT_LEN, dtype=int16)
 
-    d = display(140, 16, dev='/dev/ttyS2')
-
     while 1:
         # Roll in new frame into buffer
         try:
@@ -57,12 +55,16 @@ def gather_audio():
         draw = ImageDraw.Draw(img)
         points = [val for pair in zip(range(WIDTH), fftspec) for val in pair]
         draw.line(points, 0)
+        print('writing image')
         im = img.transpose(Image.FLIP_TOP_BOTTOM)
 
 def display_waveform():
+    d = display(140, 16, dev='/dev/ttyS2')
     while 1:
         d.displayImage(im)
 
 if __name__ == "__main__":
      process = threading.Thread(target=gather_audio)
+     process.start()
      disp = threading.Thread(target=display_waveform)
+     disp.start()
