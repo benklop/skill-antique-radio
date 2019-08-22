@@ -7,6 +7,9 @@ This file is released under the GNU Lesser General Public Licence.
 See the file LICENSE for details.
 """
 
+from PIL import Image
+from bitarray import bitarray
+
 BS  = '\x08'
 HT  = '\x09'
 LF  = '\x0A'
@@ -57,19 +60,17 @@ class GU7000(object):
         self.write('\x1f\x72%c' % reverse)
 
     def displayImageFile(self, image_file):
+        displayImage(Image.open(image_file))
 
-        from PIL import Image
-        from bitarray import bitarray
-
+    def displayImage(self, image):
         data = bitarray()
-        src = Image.open(image_file)
-        for i in range(src.width):
-            for j in range(src.height):
-                if src.getpixel((i, j)) == 255:
+        for i in range(image.width):
+            for j in range(image.height):
+                if image.getpixel((i, j)) == 255:
                     data.append(False)
                 else:
                     data.append(True)
-        d.displayBitImage(140, 2, data.tobytes())
+        d.displayBitImage(image.width, image.height / 8, data.tobytes())
 
 #____ serial ___________________________________________________________________
 
@@ -90,7 +91,7 @@ try:
 
             self._ser.write(data)
 
-except: print 'GU7000 serial not available'
+except: print('GU7000 serial not available')
 
 if __name__ == '__main__':
 
