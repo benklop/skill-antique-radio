@@ -48,7 +48,7 @@ def run():
             fftspec = [0] * SLICES
 
         #create an image
-        im = PIL.Image.new('1', (WIDTH, HEIGHT))
+        im = Image.new('1', (WIDTH, HEIGHT))
         draw = ImageDraw.Draw(im)
         draw.line(zip(iter(fftspec), iter(range(WIDTH))))
         d.displayImage(im)
