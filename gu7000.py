@@ -67,7 +67,7 @@ class GU7000(object):
                     data.append(False)
                 else:
                     data.append(True)
-        d.displayBitImage(image.width, image.height / 8, data.tobytes())
+        self.displayBitImage(image.width, image.height / 8, data.tobytes())
 
     def displayImageFile(self, image_file):
         self.displayImage(Image.open(image_file))
