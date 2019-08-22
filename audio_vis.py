@@ -30,29 +30,45 @@ def run():
     signal = empty(FFT_LEN, dtype=int16)
 
     d = display(140, 16, dev='/dev/ttyS2')
-    while 1:
-        # Roll in new frame into buffer
-        try:
-            frame = stream.read(CHUNK)
-        except IOError as e:
-            if e[1] != pyaudio.paInputOverflowed:
-                raise
-            continue
-        signal = roll(signal, -CHUNK)
-        signal[-CHUNK:] = fromstring(frame, dtype=int16)
 
-        # Now transform!
-        try:
-            fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(signal)[:WIDTH])
-        except ValueError:
-            fftspec = [0] * SLICES
+    try:
+        # Disable cursor
+        sys.stdout.write('\033[?25l')
+        while 1:
+            # Roll in new frame into buffer
+            try:
+                frame = stream.read(CHUNK)
+            except IOError as e:
+                if e[1] != pyaudio.paInputOverflowed:
+                    raise
+                continue
+            signal = roll(signal, -CHUNK)
+            signal[-CHUNK:] = fromstring(frame, dtype=int16)
 
-        #create an image
-        im = Image.new('1', (WIDTH, HEIGHT), 0)
-        draw = ImageDraw.Draw(im)
-        draw.line(zip(iter(fftspec), iter(range(WIDTH))), 1)
-        d.displayImage(im)
+            # Now transform!
+            try:
+                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(signal)[:WIDTH])
+            except ValueError:
+                fftspec = [0] * SLICES
 
+            #create an image
+            im = Image.new('1', (WIDTH, HEIGHT), 1)
+            draw = ImageDraw.Draw(im)
+            draw.line(zip(iter(fftspec), iter(range(WIDTH))), 0)
+            d.displayImage(im)
+
+            # Print it
+            lines = [
+                ''.join(spark(x - i+1, x) for x in fftspec)
+                for i in range(HEIGHT / 8, 0, -1)
+            ]
+            sys.stdout.write('│' + '│\n│'.join(lines) + '│')
+            sys.stdout.write('\033[' + str((HEIGHT / 8) - 1) +'A\r')
+    except KeyboardInterrupt:
+        sys.stdout.write('\n' * HEIGHT / 8)
+    finally:
+        # Turn the cursor back on
+        sys.stdout.write('\033[?25h')
 
 if __name__ == "__main__":
     run()
