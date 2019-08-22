@@ -14,7 +14,7 @@ WIDTH=140
 HEIGHT = 16
 SLICES=4
 
-CHUNK = int(WIDTH / SLICES) # Size of each 'frame' in rolling buffer
+CHUNK = 32 # Size of each 'frame' in rolling buffer
 FFT_LEN = CHUNK*20 # size of rolling buffer for FFT
 RATE = 8000 # Sampling rate
 SIGNAL_SCALE = .005 # Scaling factor for output
@@ -37,7 +37,7 @@ class AudioVis:
         while 1:
             # Roll in new frame into buffer
             try:
-                frame = stream.read(CHUNK)
+                frame = stream.read(CHUNK, exception_on_overflow=False)
             except IOError as e:
                 if e.args[1] != pyaudio.paInputOverflowed:
                     raise
