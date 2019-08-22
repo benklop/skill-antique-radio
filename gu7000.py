@@ -100,11 +100,11 @@ if __name__ == '__main__':
     d = GU7000Ser(140, 16, dev='/dev/ttyS2')
 
     d.clearDisplay()
-    time.sleep(2)
-    d.write('hello, noritake dude')
     time.sleep(1)
     d.setCursor(0,0)
-    for i in range(31)
+    d.displayImageFile('images/anim/westinghouse00.bmp')
+    time.sleep(2)
+    for i in range(32):
         d.displayImageFile('images/anim/westinghouse' + str(i).zfill(2) + '.bmp')
 
     #time.sleep(2)
