@@ -30,32 +30,29 @@ def run():
     signal = empty(FFT_LEN, dtype=int16)
 
     d = display(140, 16, dev='/dev/ttyS2')
-    try:
-        while 1:
-            # Roll in new frame into buffer
-            try:
-                frame = stream.read(CHUNK)
-            except IOError as e:
-                if e[1] != pyaudio.paInputOverflowed:
-                    raise
-                continue
-            signal = roll(signal, -CHUNK)
-            signal[-CHUNK:] = fromstring(frame, dtype=int16)
+    while 1:
+        # Roll in new frame into buffer
+        try:
+            frame = stream.read(CHUNK)
+        except IOError as e:
+            if e[1] != pyaudio.paInputOverflowed:
+                raise
+            continue
+        signal = roll(signal, -CHUNK)
+        signal[-CHUNK:] = fromstring(frame, dtype=int16)
 
-            # Now transform!
-            try:
-                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(signal)[:WIDTH])
-            except ValueError:
-                fftspec = [0] * SLICES
+        # Now transform!
+        try:
+            fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(signal)[:WIDTH])
+        except ValueError:
+            fftspec = [0] * SLICES
 
-            #create an image
-            im = PIL.Image.new('1', (WIDTH, HEIGHT))
-            draw = ImageDraw.Draw(im)
-            draw.line(zip(iter(fftspec), iter(range(WIDTH))))
-            d.displayImage(im)
+        #create an image
+        im = PIL.Image.new('1', (WIDTH, HEIGHT))
+        draw = ImageDraw.Draw(im)
+        draw.line(zip(iter(fftspec), iter(range(WIDTH))))
+        d.displayImage(im)
 
-            #sys.stdout.write('│' + '│\n│'.join(lines) + '│')
-            #sys.stdout.write('\033[' + str(HEIGHT - 1) +'A\r')
 
 if __name__ == "__main__":
     run()
