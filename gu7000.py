@@ -59,9 +59,6 @@ class GU7000(object):
 
         self.write('\x1f\x72%c' % reverse)
 
-    def displayImageFile(self, image_file):
-        displayImage(Image.open(image_file))
-
     def displayImage(self, image):
         data = bitarray()
         for i in range(image.width):
@@ -71,6 +68,10 @@ class GU7000(object):
                 else:
                     data.append(True)
         d.displayBitImage(image.width, image.height / 8, data.tobytes())
+
+    def displayImageFile(self, image_file):
+        self.displayImage(Image.open(image_file))
+
 
 #____ serial ___________________________________________________________________
 
