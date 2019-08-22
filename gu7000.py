@@ -45,7 +45,6 @@ class GU7000(object):
 
     def setBrightness(self, brightness):
 
-        brightness = brightness * 8 / 100
         self.write('\x1f\x58%c' % brightness)
 
     def displayBitImage(self, w, h, image):
@@ -102,12 +101,13 @@ if __name__ == '__main__':
     d.clearDisplay()
     time.sleep(1)
     d.setCursor(0,0)
-    d.displayImageFile('images/anim/westinghouse00.bmp')
-    time.sleep(2)
+
+    for i in range(1,9):
+        d.setBrightness(i)
+        d.displayImageFile('images/anim/westinghouse00.bmp')
+
     for i in range(32):
         d.displayImageFile('images/anim/westinghouse' + str(i).zfill(2) + '.bmp')
 
-    #time.sleep(2)
-    #d.clearDisplay()
 
 
