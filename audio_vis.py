@@ -15,7 +15,7 @@ WIDTH=140
 HEIGHT = 16
 SLICES=4
 
-CHUNK = 1024 # Size of each 'frame' in rolling buffer
+CHUNK = 32 # Size of each 'frame' in rolling buffer
 FFT_LEN = CHUNK*20 # size of rolling buffer for FFT
 RATE = 16000 # Sampling rate
 SIGNAL_SCALE = .005 # Scaling factor for output
@@ -59,6 +59,7 @@ class AudioVis:
 
     def display_waveform(self):
         d = display(140, 16, dev='/dev/ttyS2')
+        d.clearDisplay()
         while 1:
             # Now transform!
             try:
