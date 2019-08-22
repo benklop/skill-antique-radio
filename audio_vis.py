@@ -12,7 +12,6 @@ import threading
 
 WIDTH=140
 HEIGHT = 16
-
 SLICES=4
 
 CHUNK = int(WIDTH / SLICES) # Size of each 'frame' in rolling buffer
@@ -48,7 +47,7 @@ class AudioVis:
 
             # Now transform!
             try:
-                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(signal)[:WIDTH])
+                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 8 for x in rfft(signal)[:WIDTH])
             except ValueError:
                 fftspec = [0] * SLICES
 
@@ -57,7 +56,6 @@ class AudioVis:
             draw = ImageDraw.Draw(img)
             points = [val for pair in zip(range(WIDTH), fftspec) for val in pair]
             draw.line(points, 0)
-            print('writing image')
             self.im = img.transpose(Image.FLIP_TOP_BOTTOM)
 
     def display_waveform(self):
@@ -70,8 +68,8 @@ class AudioVis:
         process.start()
         disp = threading.Thread(target=self.display_waveform)
         disp.start()
-        process.join()
-        disp.join()
+        #process.join()
+        #disp.join()
 
 if __name__ == "__main__":
     vis = AudioVis()
