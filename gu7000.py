@@ -9,13 +9,21 @@ See the file LICENSE for details.
 
 from PIL import Image
 from bitarray import bitarray
+from pixel_ring import pixel_ring
 
-BS  = '\x08'
-HT  = '\x09'
-LF  = '\x0A'
-HOM = '\x0B'
-CR  = '\x0D'
-CLR = '\x0C'
+#first, disable the ring LEDs, since they are enabled by default at power up
+pixel_ring.off()
+
+#disable the center LED too
+pixel_ring.set_vad_led(0)
+
+
+BS  = b'\x08'
+HT  = b'\x09'
+LF  = b'\x0A'
+HOM = b'\x0B'
+CR  = b'\x0D'
+CLR = b'\x0C'
 
 #____ abstract base class ______________________________________________________
 
@@ -28,11 +36,11 @@ class GU7000(object):
 
     def showCursor(self, show=1):
 
-        self.write('\x1f\x43%c' % show)
+        self.write(b'\x1f\x43%c' % show)
 
     def setCursor(self, x, y):
 
-        self.write('\x1F\x24%c%c%c%c' % (x%256, x/256, y%256, y/256))
+        self.write(b'\x1F\x24%c%c%c%c' % (int(x%256), int(x/256), int(y%256), int(y/256)))
 
     def clearDisplay(self):
 
@@ -40,24 +48,24 @@ class GU7000(object):
 
     def initDisplay(self):
 
-        self.write('\x1B\x40')
+        self.write(b'\x1B\x40')
 
     def setWriteMixMode(self, mode):
 
-        self.write('\x1f\x77%c' % mode)
+        self.write(b'\x1f\x77%c' % mode)
 
     def setBrightness(self, brightness):
 
-        self.write('\x1f\x58%c' % brightness)
+        self.write(b'\x1f\x58%c' % brightness)
 
     def displayBitImage(self, w, h, image):
 
-        args = ( w%256, w/256, h%256, h/256, image)
-        self.write('\x1f\x28\x66\x11%c%c%c%c\x01%s' % args)
+        args = ( int(w%256), int(w/256), int(h%256), int(h/256), image)
+        self.write(b'\x1f\x28\x66\x11%c%c%c%c\x01%s' % args)
 
     def reverseDisplay(self, reverse=True):
 
-        self.write('\x1f\x72%c' % reverse)
+        self.write(b'\x1f\x72%c' % reverse)
 
     def displayImage(self, image):
         data = bitarray()
@@ -81,7 +89,7 @@ try:
 
     class GU7000Ser(GU7000):
 
-        def __init__(self, W, H, dev='/dev/ttyS2'):
+        def __init__(self, W, H, dev='/dev/ttyS4'):
 
             GU7000.__init__(self, W, H)
             self._ser = serial.Serial(dev, baudrate=38400, writeTimeout=1)
@@ -98,18 +106,25 @@ if __name__ == '__main__':
 
     import time
 
-    d = GU7000Ser(140, 16, dev='/dev/ttyS2')
+    d = GU7000Ser(140, 16, dev='/dev/ttyS4')
 
     d.clearDisplay()
     time.sleep(1)
     d.setCursor(0,0)
 
-    for i in range(1,9):
+    for i in range(0,10):
         d.setBrightness(i)
         d.displayImageFile('images/anim/westinghouse00.bmp')
 
     for i in range(32):
         d.displayImageFile('images/anim/westinghouse' + str(i).zfill(2) + '.bmp')
 
+#    for i in range(31,0,-1):
+#        d.displayImageFile('images/anim/westinghouse' + str(i).zfill(2) + '.bmp')
 
+    time.sleep(2)
+    for i in range(10,0,-1):
+        d.setBrightness(i)
+        d.displayImageFile('images/anim/westinghouse31.bmp')
 
+    d.clearDisplay()

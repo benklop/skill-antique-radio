@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import sys
 import pyaudio
 import time
+import datetime as dt
 from math import log
 from numpy.fft import rfft
 from numpy import int16, empty, fromstring, roll
@@ -56,14 +57,19 @@ class AudioVis:
                 continue
             self.signal = roll(self.signal, -CHUNK)
             self.signal[-CHUNK:] = fromstring(frame, dtype=int16)
-
+    
     def display_waveform(self):
-        d = display(140, 16, dev='/dev/ttyS2')
+        d = display(140, 16, dev='/dev/ttyS4')
+        time.sleep(0.1)
         d.clearDisplay()
+        time.sleep(0.1)
+        d.setCursor(0, 0)
+        start_time = dt.datetime.today().timestamp()
+        i=0
         while 1:
             # Now transform!
             try:
-                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 8 for x in rfft(self.signal)[:WIDTH])
+                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(self.signal)[:WIDTH])
             except ValueError:
                 fftspec = [0] * SLICES
 
@@ -73,9 +79,11 @@ class AudioVis:
             points = [val for pair in zip(range(WIDTH), fftspec) for val in pair]
             draw.line(points, 0)
             self.im = img.transpose(Image.FLIP_TOP_BOTTOM)
-
+            
             d.displayImage(self.im)
-
+            #time_diff = dt.datetime.today().timestamp() - start_time
+            #i += 1
+            #print(i / time_diff)
     def run(self):
         process = threading.Thread(target=self.gather_audio)
         process.start()
