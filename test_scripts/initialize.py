@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 User mode device driver for Noritake GU7000-series Vacuum Fluorescent Displays.
 
