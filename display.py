@@ -94,7 +94,7 @@ try:
 
         def write(self, data):
 
-            _ser.write(data)
+            self._ser.write(data)
 
 except: print('GU7000 serial not available')
 
@@ -110,23 +110,23 @@ class VFDisplay(GU7000Ser):
 
     def splashScreen():
         for i in range(0,10):
-            d.setBrightness(i)
-            d.displayImageFile('images/anim/westinghouse00.bmp')
+            self.d.setBrightness(i)
+            self.d.displayImageFile('images/anim/westinghouse00.bmp')
 
         for i in range(32):
-            d.displayImageFile('images/anim/westinghouse' + str(i).zfill(2) + '.bmp')
+            self.d.displayImageFile('images/anim/westinghouse' + str(i).zfill(2) + '.bmp')
 
         time.sleep(2)
         for i in range(10,0,-1):
-            d.setBrightness(i)
-            d.displayImageFile('images/anim/westinghouse31.bmp')
+            self.d.setBrightness(i)
+            self.d.displayImageFile('images/anim/westinghouse31.bmp')
 
-        d.clearDisplay()
-        d.setBrightness(5)
+        self.d.clearDisplay()
+        self.d.setBrightness(5)
 
     def startVis():
         while 1:
-            display.displayImage(vis.im)
+            self.d.displayImage(self.vis.im)
 
 
 if __name__ == '__main__':
