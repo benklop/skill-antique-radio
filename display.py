@@ -105,7 +105,7 @@ class VFDisplay(GU7000Ser):
         self.d.clearDisplay()
         time.sleep(1)
         self.d.setCursor(0,0)
-        self.vis = Visualizer(d)
+        self.vis = Visualizer(self.d)
         self.vis.start()
 
     def splashScreen():
