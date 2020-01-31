@@ -89,8 +89,8 @@ try:
 
             GU7000.__init__(self, W, H)
             self._ser = serial.Serial(dev, baudrate=38400, writeTimeout=1)
-            _ser.close()
-            _ser.open()
+            self._ser.close()
+            self._ser.open()
 
         def write(self, data):
 
@@ -102,11 +102,11 @@ class VFDisplay(GU7000Ser):
 
     def __init__(self):
         self.d = GU7000Ser(140, 16, dev='/dev/ttyS4')
-        d.clearDisplay()
+        self.d.clearDisplay()
         time.sleep(1)
-        d.setCursor(0,0)
+        self.d.setCursor(0,0)
         self.vis = Visualizer(d)
-        vis.start()
+        self.vis.start()
 
     def splashScreen():
         for i in range(0,10):
