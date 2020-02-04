@@ -13,8 +13,6 @@ from PIL import Image, ImageDraw
 
 import threading
 
-WIDTH=140
-HEIGHT = 16
 SLICES=4
 
 CHUNK = 32 # Size of each 'frame' in rolling buffer
@@ -23,8 +21,10 @@ RATE = 16000 # Sampling rate
 SIGNAL_SCALE = .005 # Scaling factor for output
 
 class Visualizer:
-    def __init__(self, display):
-        self.im = Image.new('1', (WIDTH, HEIGHT), 255)
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.im = Image.new('1', (width, height), 255)
         self.signal = empty(FFT_LEN, dtype=int16)
         self.listen = threading.Thread(target=self.gather_audio)
         self.draw = threading.Thread(target=self.draw_waveform)
@@ -66,14 +66,14 @@ class Visualizer:
         while 1:
             # Now transform!
             try:
-                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(self.signal)[:WIDTH])
+                fftspec = list(log(abs(x) * SIGNAL_SCALE) + 2 for x in rfft(self.signal)[:self.height])
             except ValueError:
                 fftspec = [0] * SLICES
 
             #create an image
-            img = Image.new('1', (WIDTH, HEIGHT), 255)
+            img = Image.new('1', (self.width, self.height), 255)
             draw = ImageDraw.Draw(img)
-            points = [val for pair in zip(range(WIDTH), fftspec) for val in pair]
+            points = [val for pair in zip(range(self.width), fftspec) for val in pair]
             draw.line(points, 0)
             self.im = img.transpose(Image.FLIP_TOP_BOTTOM)
 

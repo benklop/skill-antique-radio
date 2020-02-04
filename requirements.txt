@@ -1,0 +1,16 @@
+astroid==2.3.3
+bitarray==1.2.1
+isort==4.3.21
+lazy-object-proxy==1.4.3
+mccabe==0.6.1
+mycroftapi==2.0
+numpy==1.18.1
+Pillow==7.0.0
+pixel-ring==0.1.0
+PyAudio==0.2.11
+pylint==2.4.4
+pyusb==1.0.2
+six==1.14.0
+spidev==3.4
+websocket-client==0.44.0
+wrapt==1.11.2

@@ -76,6 +76,8 @@ class GU7000(object):
     def displayImageFile(self, image_file):
         self.displayImage(Image.open(image_file))
 
+    def write(self, data):
+        raise NotImplementedError()
 
 #____ serial ___________________________________________________________________
 
@@ -100,15 +102,15 @@ except: print('GU7000 serial not available')
 
 class VFDisplay(GU7000Ser):
 
-    def __init__(self):
-        self.d = GU7000Ser(140, 16, dev='/dev/ttyS4')
+    def __init__(self, width = 140, height = 16):
+        self.d = GU7000Ser(width, height, dev='/dev/ttyS4')
         self.d.clearDisplay()
         time.sleep(1)
         self.d.setCursor(0,0)
-        self.vis = Visualizer(d)
+        self.vis = Visualizer(140, 16)
         self.vis.start()
 
-    def splashScreen():
+    def splashScreen(self):
         for i in range(0,10):
             self.d.setBrightness(i)
             self.d.displayImageFile('images/anim/westinghouse00.bmp')
@@ -124,12 +126,6 @@ class VFDisplay(GU7000Ser):
         self.d.clearDisplay()
         self.d.setBrightness(5)
 
-    def startVis():
-        while 1:
-            self.d.displayImage(self.vis.im)
-
-
 if __name__ == '__main__':
     display = VFDisplay()
     display.splashScreen()
-    display.startVis()

@@ -11,15 +11,15 @@ from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 
-# Each skill is contained within its own class, which inherits base methods
-# from the MycroftSkill class.  You extend this class as shown below.
+from PIL import Image
+from bitarray import bitarray
+from pixel_ring import pixel_ring
 
-# TODO: Change "Template" to a unique name for your skill
 class AntiqueRadioSkill(MycroftSkill):
 
     # The constructor of the skill, which calls MycroftSkill's constructor
     def __init__(self):
-        super(TemplateSkill, self).__init__(name="TemplateSkill")
+        super(AntiqueRadioSkill, self).__init__(name="AntiqueRadioSkill")
 
         # Initialize working variables used within the skill.
         self.count = 0
@@ -62,4 +62,4 @@ class AntiqueRadioSkill(MycroftSkill):
 # The "create_skill()" method is used to create an instance of the skill.
 # Note that it's outside the class itself.
 def create_skill():
-    return TemplateSkill()
+    return AntiqueRadioSkill()
